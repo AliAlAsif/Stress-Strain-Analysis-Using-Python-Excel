@@ -12,14 +12,9 @@ This Python-based tool automates **stress-strain analysis** from compression tes
 - Automatically detects and extracts key parameters: **Force, Stroke, Thickness, Width, and Length**.  
 
 ✅ **Stress-Strain & Mechanical Property Calculations**  
-- **Stress (σ):**  
-  \[
-  \sigma = \frac{\text{Force}}{\text{Length} \times \text{Width}}
-  \]  
-- **Strain (ε):**  
-  \[
-  \varepsilon = \frac{\text{Stroke}}{\text{Thickness}} \times 100
-  \]  
+**Stress (σ)** = Force / (Length × Width)
+
+**Strain (ε)**= (Stroke / Thickness) × 100
 - **Maximum Stress (σc):** Identifies the peak stress value.  
 - **Compression Modulus (Ec):** Uses linear regression for stiffness estimation.  
 - **Energy Absorption (E0.x):** Computes the area under the stress-strain curve using **Simpson’s rule**.  
