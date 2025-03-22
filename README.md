@@ -7,7 +7,7 @@
 ![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)
 
 A Python-based desktop application for analyzing compression test data. This tool automates the calculation of stress, strain, compression modulus, maximum stress, and energy up to 40% strain. It also generates a stress-strain curve and saves the results in an updated Excel file.
-##Note : Follow "for test.xlsx" file basic require format
+-##Note : Follow "for test.xlsx" file basic require format
 ---
 
 ## Features
