@@ -4,10 +4,9 @@ import numpy as np
 from openpyxl.drawing.image import Image
 from scipy.stats import linregress
 from scipy.integrate import simpson
+import os
 
 # File paths and constants
-FILE_PATH = 'For test.xlsx'
-UPDATED_FILE_PATH = 'updated_' + FILE_PATH
 SEARCH_WORDS = ['Force', 'Length, L', 'Width, W', 'Stroke', 'Thickness, T', 'Maximum Stress, σc']
 
 
@@ -80,8 +79,13 @@ def calculate_stress_and_strain(file_path, search_words):
         for i, st in enumerate(strain):
             sheet.cell(row=strain_row + i + 2, column=strain_col, value=st)
 
-    workbook.save(UPDATED_FILE_PATH)
-    return stress, strain, UPDATED_FILE_PATH
+    # Save the updated file in the same directory as the input file
+    directory = os.path.dirname(file_path)  # Get the directory of the input file
+    updated_file_name = 'updated_' + os.path.basename(file_path)  # Create the updated file name
+    updated_file_path = os.path.join(directory, updated_file_name)  # Full path for the updated file
+
+    workbook.save(updated_file_path)
+    return stress, strain, updated_file_path
 
 
 def plot_stress_strain_curve(stress, strain, file_path):
@@ -167,12 +171,12 @@ def calculate_maximum_stress(sheet, positions, file_path):
 
 
 def calculate_energy_upto_strain(stress, strain, file_path):
-    """Calculate and save the energy under the stress-strain curve up to a user-specified strain percentage."""
+    """Calculate and save the energy under the stress-strain curve up to 40% strain."""
     stress = np.array(stress)
     strain = np.array(strain)
 
-    # Prompt user for maximum strain percentage
-    max_strain_percentage = float(input("Enter the maximum strain percentage: "))  # Get percentage from user
+    # Fixed maximum strain percentage
+    max_strain_percentage = 40  # Hardcoded to 40%
     max_strain = max_strain_percentage / 100  # Convert percentage to a decimal value
 
     # Filter the stress and strain arrays based on the chosen strain percentage
@@ -186,8 +190,8 @@ def calculate_energy_upto_strain(stress, strain, file_path):
     # Calculate energy using Simpson's rule
     energy = simpson(stress_subset, x=strain_subset)
 
-    # Generate the dynamic label based on the user input
-    energy_label = f"Energy up to {max_strain_percentage}% Strain, E0.{str(int(max_strain_percentage))}"
+    # Generate the fixed label
+    energy_label = f"Energy up to {max_strain_percentage}% Strain, E0.4"
 
     # Load the workbook and search for the label
     workbook = load_excel(file_path)
@@ -213,19 +217,36 @@ def calculate_energy_upto_strain(stress, strain, file_path):
     print(f"Energy up to {max_strain_percentage}% strain saved: {energy} MPa*%")
 
 
+def main():
+    # Input file path
+    file_path = input("Enter the path to the Excel file: ")
 
-# Main execution
-try:
-    stress, strain, updated_file = calculate_stress_and_strain(FILE_PATH, SEARCH_WORDS)
-    workbook = load_excel(updated_file)
-    sheet = workbook.active
-    positions = find_words_in_excel(sheet,
-                                    SEARCH_WORDS + ['Stress', 'Strain', 'Maximum Stress, σc', 'Comp. Modulus, Ec',
-                                                    'Energy up to 40.0% Strain, E0.40'])
+    try:
+        # Calculate stress and strain
+        stress, strain, updated_file = calculate_stress_and_strain(file_path, SEARCH_WORDS)
+        print(f"Stress and strain calculated. Updated file saved to: {updated_file}")
 
-    calculate_maximum_stress(sheet, positions, updated_file)
-    calculate_compression_modulus(stress, strain, updated_file)
-    calculate_energy_upto_strain(stress, strain, updated_file)
-    plot_stress_strain_curve(stress, strain, updated_file)
-except Exception as e:
-    print(f"Error: {e}")
+        # Load the updated workbook
+        workbook = load_excel(updated_file)
+        sheet = workbook.active
+        positions = find_words_in_excel(sheet, SEARCH_WORDS + ['Stress', 'Strain', 'Maximum Stress, σc', 'Comp. Modulus, Ec'])
+
+        # Calculate maximum stress
+        calculate_maximum_stress(sheet, positions, updated_file)
+
+        # Calculate compression modulus
+        calculate_compression_modulus(stress, strain, updated_file)
+
+        # Calculate energy up to 40% strain
+        calculate_energy_upto_strain(stress, strain, updated_file)
+
+        # Plot stress-strain curve
+        plot_stress_strain_curve(stress, strain, updated_file)
+        print("Stress-strain curve plotted and saved.")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    main()
