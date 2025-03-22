@@ -6,7 +6,7 @@ from scipy.stats import linregress
 from scipy.integrate import simpson
 
 # File paths and constants
-FILE_PATH = 'Processed Compression Test Data.xlsx'
+FILE_PATH = 'For test.xlsx'
 UPDATED_FILE_PATH = 'updated_' + FILE_PATH
 SEARCH_WORDS = ['Force', 'Length, L', 'Width, W', 'Stroke', 'Thickness, T', 'Maximum Stress, σc']
 
