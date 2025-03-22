@@ -1,54 +1,118 @@
 
 ---
 
-# **🔬 Stress-Strain Analysis Using Python & Excel**  
+# Compression Test Analysis Application
 
-### **📌 Project Overview**  
-This Python-based tool automates **stress-strain analysis** from compression test data stored in Excel. It efficiently processes **large datasets (including 14,407+ data points or more)**, calculates key mechanical properties, and embeds a **stress-strain curve** directly into the Excel sheet.  
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)
 
-### **⚙️ Features & Workflow**  
-✅ **Scalable Data Processing**  
-- Reads and processes **any amount of data** from an Excel file using `openpyxl`.  
-- Automatically detects and extracts key parameters: **Force, Stroke, Thickness, Width, and Length**.  
+A Python-based desktop application for analyzing compression test data. This tool automates the calculation of stress, strain, compression modulus, maximum stress, and energy up to 40% strain. It also generates a stress-strain curve and saves the results in an updated Excel file.
 
-✅ **Stress-Strain & Mechanical Property Calculations**  
-**Stress (σ)** = Force / (Length × Width)
+---
 
-**Strain (ε)**= (Stroke / Thickness) × 100
-- **Maximum Stress (σc):** Identifies the peak stress value.  
-- **Compression Modulus (Ec):** Uses linear regression for stiffness estimation.  
-- **Energy Absorption (E0.x):** Computes the area under the stress-strain curve using **Simpson’s rule**.  
+## Features
 
-✅ **Visualization**  
-- Generates a **Stress-Strain Curve** using `matplotlib`.  
-- Saves and embeds the plot directly into the Excel sheet.  
+- **Load Excel Data**: Load compression test data from an Excel file.
+- **Calculate Stress and Strain**: Automatically calculate stress and strain values based on input data.
+- **Maximum Stress**: Identify and save the maximum stress value.
+- **Compression Modulus**: Calculate and save the compression modulus (Ec).
+- **Energy Calculation**: Calculate the energy under the stress-strain curve up to 40% strain.
+- **Plot Stress-Strain Curve**: Generate and save a stress-strain curve as an image.
+- **Save Results**: Save all calculations and plots back to the Excel file in the same directory as the input file.
 
-### **🛠 Technologies Used**  
-- **Python** (`openpyxl`, `matplotlib`, `numpy`, `scipy`)  
-- **Excel** for structured data storage  
-- **Data Visualization** for insights  
+---
 
-### **🚀 Usage**  
-1️⃣ Place your **Excel data file** in the project directory.  
-2️⃣ Run the script to process the data.  
-3️⃣ The script will save **stress, strain, and other properties** back into the Excel file.  
-4️⃣ A **stress-strain curve** will be generated and embedded into the sheet.  
+## Requirements
 
-### **📂 Installation & Setup**  
+- Python 3.8+
+- Libraries:
+  - `openpyxl`
+  - `matplotlib`
+  - `numpy`
+  - `scipy`
+  - `tkinter`
+
+Install the required libraries using:
 ```bash
-pip install openpyxl numpy scipy matplotlib
-```
-Run the script:  
-```bash
-python stress_strain_analysis.py
+pip install openpyxl matplotlib numpy scipy
 ```
 
-### **📊 Results & Impact**  
-🔹 Processes **any dataset size** efficiently—no limit on data points.  
-🔹 Automates stress-strain analysis, reducing manual work.  
-🔹 Provides **accurate material property evaluations** for engineering applications.  
+---
 
-### **📎 Contributions & Feedback**  
-Feel free to **fork** this repo, suggest improvements, or reach out with any questions!  
+## How to Use
+
+1. **Run the Application**:
+   - Clone the repository:
+     ```bash
+     git clone https://github.com/AliAlAsif/Stress-Strain-Analysis-Using-Python-Excel/
+     ```
+   - Navigate to the project directory:
+     ```bash
+     cd compression-test-analysis
+     ```
+   - Run the script:
+     ```bash
+     python compression_test_app.py
+     ```
+
+2. **Load Excel File**:
+   - Click the "Load Excel File" button to load your compression test data.
+
+3. **Perform Calculations**:
+   - Use the buttons to calculate stress and strain, maximum stress, compression modulus, and energy up to 40% strain.
+
+4. **Plot Stress-Strain Curve**:
+   - Click the "Plot Stress-Strain Curve" button to generate and save the plot.
+
+5. **Save Results**:
+   - All results are automatically saved in an updated Excel file in the same directory as the input file.
+
+---
+
+## Example Input File
+
+Your Excel file should include the following columns:
+- **Force**: Applied force values.
+- **Length, L**: Length of the sample.
+- **Width, W**: Width of the sample.
+- **Stroke**: Displacement values.
+- **Thickness, T**: Thickness of the sample.
+
+---
+
+### 📊 **Core Calculations**  
+- **Stress (σ) = Force / (Length × Width)**  
+- **Strain (ε) = (Stroke / Thickness) × 100**  
+---
+
+This version avoids formula formatting issues. You can now **copy-paste it smoothly** into LinkedIn. Let me know if you need any more fixes! 😊🚀
+
+## Packaging the Application
+
+To create a standalone executable:
+1. Install PyInstaller:
+   ```bash
+   pip install pyinstaller
+   ```
+2. Package the application:
+   ```bash
+   pyinstaller --onefile --windowed compression_test_app.py
+   ```
+3. The executable will be located in the `dist` folder.
+
+---
+
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+---
+
+## Author
+
+ALI AL ASIF
+GitHub: (https://github.com/AliAlAsif/) 
+Email: asif142636@gmail.com
 
 ---
