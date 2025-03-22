@@ -50,11 +50,11 @@ pip install openpyxl matplotlib numpy scipy
      ```
    - Navigate to the project directory:
      ```bash
-     cd compression-test-analysis
+     cd Stress-Strain-Analysis-Using-Python-Excel
      ```
    - Run the script:
      ```bash
-     python compression_test_app.py
+     python App.py
      ```
 
 2. **Load Excel File**:
