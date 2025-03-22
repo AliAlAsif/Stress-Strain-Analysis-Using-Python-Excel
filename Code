@@ -4,10 +4,11 @@ import numpy as np
 from openpyxl.drawing.image import Image
 from scipy.stats import linregress
 from scipy.integrate import simpson
+import tkinter as tk
+from tkinter import filedialog, messagebox
+import os
 
 # File paths and constants
-FILE_PATH = 'Processed Compression Test Data.xlsx'
-UPDATED_FILE_PATH = 'updated_' + FILE_PATH
 SEARCH_WORDS = ['Force', 'Length, L', 'Width, W', 'Stroke', 'Thickness, T', 'Maximum Stress, σc']
 
 
@@ -80,8 +81,13 @@ def calculate_stress_and_strain(file_path, search_words):
         for i, st in enumerate(strain):
             sheet.cell(row=strain_row + i + 2, column=strain_col, value=st)
 
-    workbook.save(UPDATED_FILE_PATH)
-    return stress, strain, UPDATED_FILE_PATH
+    # Save the updated file in the same directory as the input file
+    directory = os.path.dirname(file_path)  # Get the directory of the input file
+    updated_file_name = 'updated_' + os.path.basename(file_path)  # Create the updated file name
+    updated_file_path = os.path.join(directory, updated_file_name)  # Full path for the updated file
+
+    workbook.save(updated_file_path)
+    return stress, strain, updated_file_path
 
 
 def plot_stress_strain_curve(stress, strain, file_path):
@@ -167,12 +173,12 @@ def calculate_maximum_stress(sheet, positions, file_path):
 
 
 def calculate_energy_upto_strain(stress, strain, file_path):
-    """Calculate and save the energy under the stress-strain curve up to a user-specified strain percentage."""
+    """Calculate and save the energy under the stress-strain curve up to 40% strain."""
     stress = np.array(stress)
     strain = np.array(strain)
 
-    # Prompt user for maximum strain percentage
-    max_strain_percentage = float(input("Enter the maximum strain percentage: "))  # Get percentage from user
+    # Fixed maximum strain percentage
+    max_strain_percentage = 40  # Hardcoded to 40%
     max_strain = max_strain_percentage / 100  # Convert percentage to a decimal value
 
     # Filter the stress and strain arrays based on the chosen strain percentage
@@ -186,8 +192,8 @@ def calculate_energy_upto_strain(stress, strain, file_path):
     # Calculate energy using Simpson's rule
     energy = simpson(stress_subset, x=strain_subset)
 
-    # Generate the dynamic label based on the user input
-    energy_label = f"Energy up to {max_strain_percentage}% Strain, E0.{str(int(max_strain_percentage))}"
+    # Generate the fixed label
+    energy_label = f"Energy up to {max_strain_percentage}% Strain, E0.4"
 
     # Load the workbook and search for the label
     workbook = load_excel(file_path)
@@ -213,19 +219,109 @@ def calculate_energy_upto_strain(stress, strain, file_path):
     print(f"Energy up to {max_strain_percentage}% strain saved: {energy} MPa*%")
 
 
+class CompressionTestApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Compression Test Analysis")
+        self.file_path = None
+        self.stress = None
+        self.strain = None
+        self.updated_file = None
 
-# Main execution
-try:
-    stress, strain, updated_file = calculate_stress_and_strain(FILE_PATH, SEARCH_WORDS)
-    workbook = load_excel(updated_file)
-    sheet = workbook.active
-    positions = find_words_in_excel(sheet,
-                                    SEARCH_WORDS + ['Stress', 'Strain', 'Maximum Stress, σc', 'Comp. Modulus, Ec',
-                                                    'Energy up to 40.0% Strain, E0.40'])
+        # Create GUI elements
+        self.label = tk.Label(root, text="Compression Test Analysis", font=("Arial", 16))
+        self.label.pack(pady=10)
 
-    calculate_maximum_stress(sheet, positions, updated_file)
-    calculate_compression_modulus(stress, strain, updated_file)
-    calculate_energy_upto_strain(stress, strain, updated_file)
-    plot_stress_strain_curve(stress, strain, updated_file)
-except Exception as e:
-    print(f"Error: {e}")
+        self.load_button = tk.Button(root, text="Load Excel File", command=self.load_file)
+        self.load_button.pack(pady=5)
+
+        self.calculate_button = tk.Button(root, text="Calculate Stress and Strain", command=self.calculate_stress_strain)
+        self.calculate_button.pack(pady=5)
+
+        self.max_stress_button = tk.Button(root, text="Calculate Maximum Stress", command=self.calculate_max_stress)
+        self.max_stress_button.pack(pady=5)
+
+        self.modulus_button = tk.Button(root, text="Calculate Compression Modulus", command=self.calculate_modulus)
+        self.modulus_button.pack(pady=5)
+
+        self.energy_button = tk.Button(root, text="Calculate Energy up to 40% Strain", command=self.calculate_energy)
+        self.energy_button.pack(pady=5)
+
+        self.plot_button = tk.Button(root, text="Plot Stress-Strain Curve", command=self.plot_curve)
+        self.plot_button.pack(pady=5)
+
+    def load_file(self):
+        """Load the Excel file."""
+        self.file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")])
+        if self.file_path:
+            messagebox.showinfo("File Loaded", f"File {self.file_path} loaded successfully.")
+
+    def calculate_stress_strain(self):
+        """Calculate stress and strain."""
+        if not self.file_path:
+            messagebox.showerror("Error", "Please load an Excel file first.")
+            return
+
+        try:
+            self.stress, self.strain, self.updated_file = calculate_stress_and_strain(self.file_path, SEARCH_WORDS)
+            messagebox.showinfo("Success", f"Stress and strain calculated and saved to:\n{self.updated_file}")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def calculate_max_stress(self):
+        """Calculate maximum stress."""
+        if not self.updated_file:
+            messagebox.showerror("Error", "Please calculate stress and strain first.")
+            return
+
+        try:
+            workbook = load_excel(self.updated_file)
+            sheet = workbook.active
+            positions = find_words_in_excel(sheet, SEARCH_WORDS + ['Stress', 'Maximum Stress, σc'])
+            calculate_maximum_stress(sheet, positions, self.updated_file)
+            messagebox.showinfo("Success", "Maximum stress calculated and saved successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def calculate_modulus(self):
+        """Calculate compression modulus."""
+        if not self.stress or not self.strain:
+            messagebox.showerror("Error", "Please calculate stress and strain first.")
+            return
+
+        try:
+            calculate_compression_modulus(self.stress, self.strain, self.updated_file)
+            messagebox.showinfo("Success", "Compression modulus calculated and saved successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def calculate_energy(self):
+        """Calculate energy up to 40% strain."""
+        if not self.stress or not self.strain:
+            messagebox.showerror("Error", "Please calculate stress and strain first.")
+            return
+
+        try:
+            calculate_energy_upto_strain(self.stress, self.strain, self.updated_file)
+            messagebox.showinfo("Success", "Energy up to 40% strain calculated and saved.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def plot_curve(self):
+        """Plot the stress-strain curve."""
+        if not self.stress or not self.strain:
+            messagebox.showerror("Error", "Please calculate stress and strain first.")
+            return
+
+        try:
+            plot_stress_strain_curve(self.stress, self.strain, self.updated_file)
+            messagebox.showinfo("Success", "Stress-strain curve plotted and saved successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+
+# Run the application
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = CompressionTestApp(root)
+    root.mainloop()
